@@ -37,7 +37,7 @@ class _GraphPageState extends State<GraphPage> {
             return _buildLoaded(snapshot.data!);
           }
           if (snapshot.hasError) {
-            return _buildError();
+            return _buildError(snapshot.error!);
           }
           return _buildLoading();
         },
@@ -106,18 +106,19 @@ class _GraphPageState extends State<GraphPage> {
     );
   }
 
-  Widget _buildError() {
-    return const Center(
+  Widget _buildError(Object error) {
+    return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
-          Icon(
+          const Icon(
             Icons.error,
             color: Colors.red,
           ),
           Text(
-            'Error occurred loading data',
-            style: TextStyle(fontSize: 20),
+            'Error occurred loading data\n$error',
+            style: const TextStyle(fontSize: 20),
+            textAlign: TextAlign.center,
           ),
         ],
       ),

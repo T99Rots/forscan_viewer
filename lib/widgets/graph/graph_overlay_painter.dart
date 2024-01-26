@@ -1,20 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:forscan_viewer/models/_models.dart';
 import 'package:forscan_viewer/parser/models/_models.dart';
-import 'package:forscan_viewer/utils/_utils.dart';
 
 class GraphOverlayPainter extends CustomPainter {
   const GraphOverlayPainter({
     required this.xPosition,
     required this.data,
     required this.sharedScale,
-    required this.range,
+    required this.timeRange,
+    required this.valueRange,
   });
 
   final double xPosition;
   final List<Data> data;
   final bool sharedScale;
-  final Range range;
+  final Range timeRange;
+  final Range valueRange;
 
   static const double _textPadding = 5;
 
@@ -30,23 +31,20 @@ class GraphOverlayPainter extends CustomPainter {
       paint,
     );
 
-    final int duration = data.duration;
-    final double totalMinimum = data.minimum;
-    final double totalMaximum = data.maximum;
-
     final List<_TextValue> textValues = <_TextValue>[];
     double maxWidth = 0;
 
     for (final Data data in data) {
       // Get point at current position and get y scale.
-      final double minimum = sharedScale ? totalMinimum : data.minimum;
-      final double maximum = sharedScale ? totalMaximum : data.maximum;
-      final double range = maximum - minimum;
-      final Range scaledRange = this.range.scale(0, duration.toDouble());
-      final double yScale = size.height / range;
-      final double yOffset = yScale * minimum;
+      final Range(
+        :double start,
+        :double range,
+      ) = sharedScale ? valueRange : data.range;
 
-      final int ms = scaledRange.valueAt(xPosition / size.width).toInt();
+      final double yScale = size.height / range;
+      final double yOffset = yScale * start;
+
+      final int ms = timeRange.valueAt(xPosition / size.width).toInt();
       final DataPoint point = data.getNearestPoint(ms);
 
       // Paint point at current point.
@@ -79,13 +77,13 @@ class GraphOverlayPainter extends CustomPainter {
         fullValue += unit;
       }
 
+      if (!sharedScale) {
+        fullValue += ' (${data.name})';
+      }
+
       final TextSpan span = TextSpan(
         text: fullValue,
-        style: TextStyle(
-          color: data.color,
-          backgroundColor: Colors.black,
-          fontSize: 16,
-        ),
+        style: TextStyle(color: data.color, backgroundColor: Colors.black, fontSize: 16, fontWeight: FontWeight.bold),
       );
 
       final TextPainter painter = TextPainter(
@@ -163,7 +161,10 @@ class GraphOverlayPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant GraphOverlayPainter oldDelegate) {
-    return oldDelegate.xPosition != xPosition;
+    return oldDelegate.xPosition != xPosition ||
+        oldDelegate.timeRange != timeRange ||
+        oldDelegate.data != data ||
+        oldDelegate.sharedScale != sharedScale;
   }
 }
 

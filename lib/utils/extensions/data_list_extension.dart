@@ -1,24 +1,19 @@
+import 'package:forscan_viewer/models/range.dart';
 import 'package:forscan_viewer/parser/models/_models.dart';
 
 extension DataListExtension on List<Data> {
-  double get minimum {
-    double minimum = double.infinity;
-    for (final Data item in this) {
-      if (item.minimum < minimum) {
-        minimum = item.minimum;
+  Range get range {
+    double start = double.infinity;
+    double end = double.negativeInfinity;
+    for (final Data data in this) {
+      if (data.range.start < start) {
+        start = data.range.start;
+      }
+      if (data.range.end > end) {
+        end = data.range.end;
       }
     }
-    return minimum;
-  }
-
-  double get maximum {
-    double maximum = double.negativeInfinity;
-    for (final Data item in this) {
-      if (item.maximum > maximum) {
-        maximum = item.maximum;
-      }
-    }
-    return maximum;
+    return Range(start, end);
   }
 
   int get duration {

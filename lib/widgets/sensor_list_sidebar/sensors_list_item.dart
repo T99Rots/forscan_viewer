@@ -15,21 +15,20 @@ class SensorsListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    String fullName = item.fullName;
-
-    if (item.unit != null) {
-      fullName += ' (${item.unit})';
-    }
+    final String fullName = '${item.fullName} (${item.name})';
 
     return ColoredBox(
       color: item.color,
       child: RepaintBoundary(
-        child: CheckboxListTile(
-          value: selected,
-          onChanged: (_) {
-            onToggled();
-          },
-          checkColor: Colors.black,
+        child: ListTile(
+          leading: Checkbox(
+            onChanged: (_) {
+              onToggled();
+            },
+            value: selected,
+            checkColor: Colors.black,
+          ),
+          onTap: onToggled,
           title: Text(
             fullName,
             style: const TextStyle(

@@ -17,11 +17,18 @@ class SensorListSidebar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: 280,
-      child: ListView(
+      width: 320,
+      child: ReorderableListView(
+        onReorder: (int oldIndex, int newIndex) {
+          if (oldIndex < newIndex) {
+            newIndex -= 1;
+          }
+          data.insert(newIndex, data.removeAt(oldIndex));
+        },
         children: List<Widget>.generate(
           data.length,
           (int index) => SensorsListItem(
+            key: ValueKey(data[index].index),
             item: data[index],
             onToggled: () => dataToggled(data[index]),
             selected: selected.contains(data[index]),

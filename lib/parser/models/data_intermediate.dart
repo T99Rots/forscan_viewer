@@ -1,5 +1,7 @@
 import 'dart:ui';
 
+import 'package:forscan_viewer/models/range.dart';
+
 import '_models.dart';
 import 'name_map.dart';
 
@@ -7,10 +9,12 @@ class DataIntermediate {
   DataIntermediate({
     required this.name,
     required this.color,
+    required this.index,
   });
 
   final String name;
   final Color color;
+  final int index;
   final List<DataPoint> points = <DataPoint>[];
   final List<String> enums = <String>[];
   double minimum = double.infinity;
@@ -70,8 +74,8 @@ class DataIntermediate {
     final RegExpMatch match = nameRegex.firstMatch(name)!;
 
     return Data(
-      maximum: maximum,
-      minimum: minimum,
+      index: index,
+      range: Range(minimum, maximum),
       points: points,
       name: match.group(1)!,
       fullName: nameMap[match.group(1)!] ?? name,

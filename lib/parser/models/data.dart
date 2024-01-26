@@ -1,27 +1,30 @@
+import 'dart:math';
 import 'dart:ui';
+
+import 'package:forscan_viewer/models/range.dart';
 
 import '_models.dart';
 
 class Data {
   const Data({
-    required this.maximum,
-    required this.minimum,
+    required this.range,
     required this.points,
     required this.name,
     required this.fullName,
     required this.unit,
     required this.duration,
     required this.color,
+    required this.index,
   });
 
   final List<DataPoint> points;
-  final double minimum;
-  final double maximum;
+  final Range range;
   final String name;
   final String fullName;
   final String? unit;
   final int duration;
   final Color color;
+  final int index;
 
   int getNearestPointIndex(int milliseconds) {
     int start = 0;
@@ -49,6 +52,26 @@ class Data {
           ? start
           : end;
     }
+  }
+
+  int getNearestPointIndexAbove(int milliseconds) {
+    final int index = getNearestPointIndex(milliseconds);
+
+    if (points[index].milliseconds < milliseconds) {
+      return min(points.length - 1, index + 1);
+    }
+
+    return index;
+  }
+
+  int getNearestPointIndexBelow(int milliseconds) {
+    final int index = getNearestPointIndex(milliseconds);
+
+    if (points[index].milliseconds > milliseconds) {
+      return max(0, index - 1);
+    }
+
+    return index;
   }
 
   DataPoint getNearestPoint(int milliseconds) {
